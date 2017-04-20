@@ -3,4 +3,4 @@ Daniel Edem Kpormegbey
 sareh assiri
 Isaac Shaffer
 sareh assiri
-Tsosie Schneider
+Tsosie E Schneider
