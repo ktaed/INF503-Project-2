@@ -1,9 +1,22 @@
 #include <fstream>
 #include <iostream>
 #include <random>
+#include <smithwat.cpp>
 #include <prefixtrie.cpp>
 
 using namespace std;
+
+class randomNum { 
+
+    std::mt19937 rng;
+
+public:
+    randomNum() : rng(std::random_device()()) {}
+    int operator()(int low, int high) { 
+        int uni = low + rng() % (high-low);
+        return uni;
+        }
+};
 
 int main(int argc, char *argv[])
 {

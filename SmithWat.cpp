@@ -1,7 +1,3 @@
-#include <iostream>
-#include <random>
-#include <time.h>
-
 using namespace std;
 
 class SmithWaterman
@@ -191,62 +187,3 @@ class SmithWaterman
 	int sizeA, sizeB;
 	
 };
-
-class randomNum 
-{ 
-    std::mt19937 rng;
-public:
-    randomNum() : rng(std::random_device()()) {}
-    int operator()(int low, int high) { 
-        int uni = low + rng() % (high - low +1);
-        return uni;
-    }
-};
-
-	
-char *fragMaker(int size)
-{
-	randomNum randy;
-	char lets[] = "ACGT";
-	char *A = new char[size+1];
-	for (int i=0; i<size; i++)
-	{
-		A[i] = lets[randy(0,3)];
-	}
-	A[size] = '\0';
-	return A;
-};
-
-	
-
-int main(int argc, char *argv[])
-{
-	unsigned int start=time(0), finish;
-	
-	int ntsize = 100;
-	
-	int numSubs = 1;
-	
-	if (argc > 1)  
-	{
-		numSubs = std::atoi(argv[1]);
-	}
-	
-	SmithWaterman frag(2, -1, -3);
-	
-	char *Q = fragMaker(ntsize);	
-
-	for (int i=0; i<numSubs; i++)
-	{
-		char *S = fragMaker(ntsize);
-		frag.checkBest(S, Q);
-	}
-	
-	frag.showBest();
-	
-	finish = time(0);
-	cout << "Elapsed time: "<<(finish-start)/60<<" minutes and ";
-	cout <<(finish - start) % 60 << " seconds."<<endl;
-	
-	return 0;
-}

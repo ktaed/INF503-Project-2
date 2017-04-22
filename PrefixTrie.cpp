@@ -1,5 +1,3 @@
-#include <fstream>
-#include <iostream>
 #include <random>
 
 using namespace std;
@@ -11,18 +9,6 @@ struct Node
 	Node *G;
 	Node *T;
 	int *loc;
-};
-
-class randomNum { 
-
-    std::mt19937 rng;
-
-public:
-    randomNum() : rng(std::random_device()()) {}
-    int operator()(int low, int high) { 
-        int uni = low + rng() % (high-low);
-        return uni;
-        }
 };
 
 class PrefixTrie
@@ -159,7 +145,6 @@ class PrefixTrie
 		}
 		current->loc[current->loc[0]] = locInG;
 		current->loc[0]++;
-		if (temp[0] > maxReps) {maxReps = temp[0]; cout << "Max Reps: "<<maxReps<<endl;}
 		delete temp;
 	}
 	
