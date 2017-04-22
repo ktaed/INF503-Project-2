@@ -10,7 +10,7 @@ struct Node
 	Node *C;
 	Node *G;
 	Node *T;
-	bool Leaf;
+	int *loc;
 };
 
 class randomNum { 
@@ -29,13 +29,31 @@ class PrefixTrie
 {
 	private:
 	Node *root;
-	unsigned int nodeCount;
+	unsigned int nodeCount, maxReps;
 	
 	public:
 	PrefixTrie()
 	{
-		this->nodeCount = 1;
+		this->nodeCount = 0;
+		this->maxReps = 0;
 		this->root = newNode();
+	}
+	
+	PrefixTrie(char *seq, int seqSize, int wordSize)
+	{
+		int i,j;
+		char loadSeq[wordSize];
+		this->nodeCount = 0;
+		this->maxReps = 0;
+		this->root = newNode();
+		for (i = 0; i < seqSize-wordSize+1; i++)
+		{
+			for (j = 0; j < wordSize; j++)
+			{
+				loadSeq[j] = seq[i+j]; 
+			}// end j for
+			add(loadSeq, wordSize, i); 
+		}// end i for
 	}
 	
 	~PrefixTrie()
@@ -51,85 +69,98 @@ class PrefixTrie
 		current->C = NULL;
 		current->G = NULL;
 		current->T = NULL;
-		current->Leaf = 0;
+		current->loc = new int;
+		current->loc[0] = 1;
+		this->nodeCount++;
 		return current;
 	}
-
-	void prune(Node *current)
+	
+	void deleteNode(Node *current)
 	{
-		if (current->A != NULL)
-		{
-			prune(current->A);
-		}
-		if (current->C != NULL)
-		{
-			prune(current->C);
-		}
-		if (current->G != NULL)
-		{
-			prune(current->G);
-		}
-		if (current->T != NULL)
-		{
-			prune(current->T);
-		}
+		delete current->loc;
 		delete current;
 		this->nodeCount--;
 	}
 	
-	void add(char *seq, int seqSize)
+	void prune(Node *current)
+	{
+		if (current->A)
+		{
+			prune(current->A);
+		}
+		if (current->C)
+		{
+			prune(current->C);
+		}
+		if (current->G)
+		{
+			prune(current->G);
+		}
+		if (current->T)
+		{
+			prune(current->T);
+		}
+		deleteNode(current);
+	}
+	
+	void add(char *seq, int seqSize, int locInG)
 	{
 		Node *current = this->root;
 		for (int i = 0; i < seqSize; i++)
 		{
 			switch (seq[i])
 			{
-				case 'A':
-					if (current->A == NULL)
-					{
-						current->A = newNode();
-						this->nodeCount++;
-						current = current->A;
-					} else {
-						current = current->A;
-					}
-					break;
-				
-				case 'C':
-					if (current->C == NULL)
-					{
-						current->C = newNode();
-						this->nodeCount++;
-						current = current->C;
-					} else {
-						current = current->C;
-					}
-					break;
-				
-				case 'G':
-					if (current->G == NULL)
-					{
-						current->G = newNode();
-						this->nodeCount++;
-						current = current->G;
-					} else {
-						current = current->G;
-					}
-					break;
-				
-				case 'T':
-					if (current->T == NULL)
-					{
-						current->T = newNode();
-						this->nodeCount++;
-						current = current->T;
-					} else {
-						current = current->T;
-					}
-					break;			
+			case 'A':
+				if (current->A)
+				{
+					current = current->A;
+				} else {
+					current->A = newNode();
+					current = current->A;
+				}
+				break;
+			
+			case 'C':
+				if (current->C)
+				{
+					current = current->C;
+				} else {
+					current->C = newNode();
+					current = current->C;
+				}
+				break;
+			
+			case 'G':
+				if (current->G)
+				{
+					current = current->G;
+				} else {
+					current->G = newNode();
+					current = current->G;
+				}
+				break;
+			
+			case 'T':
+				if (current->T)
+				{
+					current = current->T;
+				} else {
+					current->T = newNode();
+					current = current->T;
+				}
+				break;			
 			}// end switch
-		}// end while
-		current->Leaf = 1;
+		}// end for
+		int *temp = current->loc;
+		current->loc = new int[temp[0]+1];
+		for (int k=0; k < temp[0]; k++)
+		{
+			current->loc[k] = temp[k];
+		}
+		current->loc[current->loc[0]] = locInG;
+		current->loc[0]++;
+		if (temp[0] > maxReps) {maxReps = temp[0]; cout << "Max Reps: "<<maxReps<<endl;}
+		delete temp;
 	}
 	
 	unsigned int size()
@@ -137,7 +168,7 @@ class PrefixTrie
 		return this->nodeCount;
 	}
 	
-	bool found(char *seq, int seqSize)
+	int *found(char *seq, int seqSize)
 	{
 		Node *current = this->root;
 		
@@ -167,9 +198,9 @@ class PrefixTrie
 		}// end while
 		if (current != NULL)
 		{
-			return ((current->Leaf) && (i == seqSize));
+			return (current->loc);
 		} else {
-			return 0;
+			return NULL;
 		}
 	}	
 };
@@ -177,11 +208,9 @@ class PrefixTrie
 int main(int argc, char *argv[])
 {
 	unsigned int i, j, k, pos;
-	unsigned int N = 100, merSize = 36, G = 0;
+	unsigned int N = 100, wordSize = 23, G = 0;
 	randomNum randy;
-	char randyMer[merSize];
 	char temp;
-	PrefixTrie PT;
 	
 	if (argc > 1)
 	{
@@ -190,22 +219,28 @@ int main(int argc, char *argv[])
 	
 	// Load DENV2
 	fstream f;
-	f.open("./DENV2.txt", std::fstream::in);
+	f.open("./test_genome.fasta", std::fstream::in);
 	while (!f.eof()) 
 	{
 		f >> temp;
 		G++;
 	}
 	
+	cout << "Genome Size: "<<G<<endl;
+	
 	f.clear();
 	f.seekg(0, std::ios::beg);
-	char DENV2[G];
+	char genome[G];
 	for (i=0; i<G; i++)
 	{
-		f >> DENV2[i];
+		f >> genome[i];
 	}
 	
-	for (i=0; i < N; i++)
+	PrefixTrie PT(genome, G, wordSize);
+	
+	cout << "Trie Size: " << PT.size() << endl;
+	
+/*	for (i=0; i < N; i++)
 	{
 		pos = randy(0, G-merSize);	
 		for (j = 0; j < merSize; j++)
@@ -224,7 +259,7 @@ int main(int argc, char *argv[])
 	}
 	
 	cout<< endl << "For "<<N<<" random fragments, "<<PT.size()<<" nodes were required."<< endl;
-	
+*/	
 	return 0;
 }
 
