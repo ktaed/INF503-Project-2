@@ -22,24 +22,27 @@ int main(int argc, char *argv[])
 {
 	unsigned int i, j, k, pos;
 	unsigned int N = 100, wordSize = 23, G = 0;
+	unsigned int QSize = 100;
+	int largestCluster;
 	randomNum randy;
-	char temp;
+	char temp[101];
 	
 	if (argc > 1)
 	{
 		N = std::atoi(argv[1]);
 	}
 	
-	// Load DENV2
+	// Load genome
 	fstream f;
-	f.open("./test_genome.fasta", std::fstream::in);
+	f.open("./DENV2.txt", std::fstream::in);
+//	f.open("./test_genome.fasta", std::fstream::in);
 	while (!f.eof()) 
 	{
-		f >> temp;
+		f >> temp[0];
 		G++;
 	}
 	
-	cout << "Genome Size: "<<G<<endl;
+//	cout << "Genome Size: "<<G<<endl;
 	
 	f.clear();
 	f.seekg(0, std::ios::beg);
@@ -51,28 +54,59 @@ int main(int argc, char *argv[])
 	
 	PrefixTrie PT(genome, G, wordSize);
 	
-	cout << "Trie Size: " << PT.size() << endl;
+//	cout << "Trie Size: " << PT.size() << endl;
 	
-/*	for (i=0; i < N; i++)
+	char **DATASet = new char*[100];
+	
+	fstream DATAFile; // declare File
+	DATAFile.open("./sample_DENV2.fasta", std::fstream::in); //Open File
+//	DATAFile.open("./sample_reads.fasta", std::fstream::in); //Open File
+	k=0;
+	while (!DATAFile.eof())
 	{
-		pos = randy(0, G-merSize);	
-		for (j = 0; j < merSize; j++)
-		{
-			randyMer[j] = DENV2[j+pos];
-		}
-		PT.add(randyMer, merSize);
-//		randyMer[1] = 'A';
-//		if (i%(N/100)==0)
-//		{
-//			if (PT.found(randyMer, merSize))
-//			{
-//				cout << i << " Hooray!!" << endl;
-//			}
-//		}
+		DATAFile.getline (temp,QSize+1);
+		if (temp[0] != '>') {
+			DATASet[k] = new char[QSize];
+			for (i=0; i<QSize; i++) {DATASet[k][i] = temp[i];}
+			k++;
+		};
 	}
+//	cout<<"Got "<< k-1<<" test reads."<<endl;
 	
-	cout<< endl << "For "<<N<<" random fragments, "<<PT.size()<<" nodes were required."<< endl;
-*/	
+	int bitArray[G-wordSize+1];
+	int *locations;
+	
+	for (i=0;i<100;i++)
+	{
+		for (j=0; j<G-wordSize+1; j++){bitArray[j] = 0;}
+		for (j=0; j<QSize-wordSize; j++)
+		{
+			for (k=0; k < wordSize; k++){temp[k] = DATASet[i][k+j];}
+			locations = PT.found(temp, wordSize);
+			if (locations)
+			{
+				for (k=1; k<locations[0]; k++){bitArray[locations[k]] = 1;}
+			}
+		}
+		largestCluster = 0;
+		int tempCount = 0;
+		int clusterLoc = 0;
+		for (j=0; j < G - QSize; j++)
+		{
+			tempCount =0;
+			for (k=0; k< QSize - wordSize + 1; k++)
+			{
+				tempCount = tempCount + bitArray[k+j];
+			}
+			if (tempCount > largestCluster)
+			{
+				clusterLoc = j;
+				largestCluster = tempCount;
+			}
+		}
+		cout << "For seq "<<i<<", the largest cluster "<<largestCluster<<" found at "<<clusterLoc<<endl;
+	}
+		
 	return 0;
 }
 
