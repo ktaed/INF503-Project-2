@@ -1,15 +1,16 @@
 using namespace std;
 
-class SmithWaterman
+struct AlignOut
 {
-	struct AlignOut
-	{
-		double score;
-		char ResA[200];
-		char AlSymb[200];
-		char ResB[200];
-	};
-	
+	double score;
+	char *ResA;
+	char *AlSymb;
+	char *ResB;
+	int alignSize;
+};
+
+class SmithWaterman
+{	
 	public:
 	
 	SmithWaterman(double Nmatch, double Nmismatch, double Ngap)
@@ -27,15 +28,15 @@ class SmithWaterman
 		free(BestResB);
 	}
 			
-	AlignOut Align(char *SeqA, char *SeqB)
+	AlignOut *Align(char *SeqA, int sizeA, char *SeqB, int sizeB)
 	{
 		double left, up, diag, MaxScore = 0;
 		int i, j, Maxi, Maxj;
-		sizeA = 0;
-		sizeB = 0;
+//		sizeA = 0;
+//		sizeB = 0;
 
-		while (SeqA[sizeA] != '\0') {sizeA++;}
-		while (SeqB[sizeB] != '\0') {sizeB++;}
+//		while (SeqA[sizeA] != '\0') {sizeA++;}
+//		while (SeqB[sizeB] != '\0') {sizeB++;}
 
 		char ResultA[sizeA+sizeB], Alignment[sizeA+sizeB], ResultB[sizeA+sizeB];		
 		double DScore[sizeA+1][sizeB+1];
@@ -76,19 +77,15 @@ class SmithWaterman
 				{
 					Trace[i][j] = 'D';
 				}
-				if (DScore[i][j] == 0)
-				{
-					Trace[i][j] = 'S';
-				}
 			}
 		}
 
 		i = Maxi;
 		j = Maxj;
 
-		int k = 0;
+		int k = 0, SNPCount = 0;
 				
-		while (((i != 0) || (j != 0)) && (Trace[i][j] != 'S'))
+		while (((i != 0) || (j != 0)) && (DScore[i][j]))
 		{
 			switch (Trace[i][j])
 			{
@@ -96,12 +93,14 @@ class SmithWaterman
 					ResultA[k] = SeqA[i-1];
 					ResultB[k] = '_';
 					Alignment[k] = ' ';
+					SNPCount++;
 					i--;
 					break;
 				case 'L':
 					ResultA[k] = '_';
 					ResultB[k] = SeqB[j-1];
 					Alignment[k] = ' ';
+					SNPCount++;
 					j--;
 					break;
 				case 'D':
@@ -112,6 +111,7 @@ class SmithWaterman
 						Alignment[k] = '|';
 					} else {
 						Alignment[k] = 'X';
+						SNPCount++;
 					}
 					i--; j--;
 					break;
@@ -119,19 +119,23 @@ class SmithWaterman
 		k++;
 		}
 		
-		AlignOut output;
+		AlignOut *output = new AlignOut;
+		output.alignSize = k;
+		output->ResA = new char[k];
+		output->ResB = new char[k];
+		output->AlSymb = new char[k];
 		
-		for (i=0; i < k; i++){
-			
-			output.ResA[i] = ResultA[k-i-1];
-			output.ResB[i] = ResultB[k-i-1];
-			output.AlSymb[i] = Alignment[k-i-1];
+		for (i=0; i < k; i++)
+		{
+			output->ResA[i] = ResultA[k-i-1];
+			output->ResB[i] = ResultB[k-i-1];
+			output->AlSymb[i] = Alignment[k-i-1];
 		}
 		
-		output.ResA[k] = '\0';
-		output.ResB[k] = '\0';
-		output.AlSymb[k] = '\0';
-		output.score = MaxScore;
+		output->ResA[k] = '\0';
+		output->ResB[k] = '\0';
+		output->AlSymb[k] = '\0';
+		output.score = SNPCount;
 		
 		return output;
 	}

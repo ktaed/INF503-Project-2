@@ -21,9 +21,14 @@ public:
 int main(int argc, char *argv[])
 {
 	unsigned int i, j, k, pos;
-	unsigned int N = 100, wordSize = 23, G = 0;
+	unsigned int N = 100;
+	unsigned int wordSize = 23;
+	unsigned int G = 0;
 	unsigned int QSize = 100;
+	int SNPLimit = 3; 
 	int largestCluster;
+	SmithWat::AlignOut alignment;
+	SmithWat::SmithWaterman SW(2,-1,-3);
 	randomNum randy;
 	char temp[101];
 	
@@ -76,7 +81,7 @@ int main(int argc, char *argv[])
 	int bitArray[G-wordSize+1];
 	int *locations;
 	
-	for (i=0;i<100;i++)
+	for (i=0;i<N;i++)
 	{
 		for (j=0; j<G-wordSize+1; j++){bitArray[j] = 0;}
 		for (j=0; j<QSize-wordSize; j++)
@@ -89,8 +94,6 @@ int main(int argc, char *argv[])
 			}
 		}
 		largestCluster = 0;
-		int tempCount = 0;
-		int clusterLoc = 0;
 		for (j=0; j < G - QSize; j++)
 		{
 			tempCount =0;
@@ -104,6 +107,16 @@ int main(int argc, char *argv[])
 				largestCluster = tempCount;
 			}
 		}
+		/* ----------------- ISAAC IS WORKING BELOW HERE ----------------*/
+		int tempCount = 0;
+		int firstClusterSeed = 0;
+		int lastClusterSeed = 0;
+		alignment.score = QSize;
+		while (alignment.score > SNPLimit)
+		{
+			alignment = SW.align(
+		
+		
 		cout << "For seq "<<i<<", the largest cluster "<<largestCluster<<" found at "<<clusterLoc<<endl;
 	}
 		
