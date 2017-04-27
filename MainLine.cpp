@@ -1,126 +1,144 @@
 #include <fstream>
 #include <iostream>
-#include <random>
-#include <smithwat.cpp>
-#include <prefixtrie.cpp>
+#include "Levenshtein.cpp"
+#include "PrefixTrie.cpp"
+#include <string.h>
+#include <vector>
+#include <utility>
 
 using namespace std;
 
-class randomNum { 
-
-    std::mt19937 rng;
-
-public:
-    randomNum() : rng(std::random_device()()) {}
-    int operator()(int low, int high) { 
-        int uni = low + rng() % (high-low);
-        return uni;
-        }
-};
-
 int main(int argc, char *argv[])
 {
-	unsigned int i, j, k, pos;
-	unsigned int N = 100;
-	unsigned int wordSize = 23;
+
+	unsigned int i, j, k;
+	unsigned int N;
+	unsigned int wordSize, clustMin;
 	unsigned int G = 0;
-	unsigned int QSize = 100;
-	int SNPLimit = 3; 
-	int largestCluster;
-	SmithWat::AlignOut alignment;
-	SmithWat::SmithWaterman SW(2,-1,-3);
-	randomNum randy;
-	char temp[101];
-	
-	if (argc > 1)
+    unsigned int read_total = 0;
+
+	int SNPLimit = atoi(argv[3]);
+    char** headers, **reads;
+	ifstream f;
+    string genome,temp, line;
+
+    // Load genome into string
+	f.open(argv[2]);
+	while (!f.eof())
 	{
-		N = std::atoi(argv[1]);
+	    getline(f, line);
+	    if (line.length() && line[0] != '>')
+            genome += line;
 	}
-	
-	// Load genome
-	fstream f;
-	f.open("./DENV2.txt", std::fstream::in);
-//	f.open("./test_genome.fasta", std::fstream::in);
-	while (!f.eof()) 
-	{
-		f >> temp[0];
-		G++;
+    f.close();
+
+    // Assign genome length
+    G = genome.length();
+
+    // Count the total reads for space allocation and get read length
+	f.open(argv[1], std::fstream::in); //Open File
+	while(!f.eof()){
+        getline(f, line);
+        if (line[0] == '>')
+            read_total++;
+        else if (line.length())
+            N = line.length();
 	}
-	
-//	cout << "Genome Size: "<<G<<endl;
-	
-	f.clear();
-	f.seekg(0, std::ios::beg);
-	char genome[G];
-	for (i=0; i<G; i++)
-	{
-		f >> genome[i];
+	f.close();
+
+    // Allocate space for reads
+	headers = new char*[read_total];
+    reads = new char*[read_total];
+
+    // Read in the reads file
+    f.open(argv[1], std::fstream::in); //Open File
+	for(i=0;i<read_total;i++){
+        getline(f, line);
+        headers[i] = new char[line.length()];
+        strcpy(headers[i], line.c_str());
+
+        getline(f, line);
+        reads[i] = new char[line.length()];
+        strcpy(reads[i], line.c_str());
+
 	}
-	
-	PrefixTrie PT(genome, G, wordSize);
-	
-//	cout << "Trie Size: " << PT.size() << endl;
-	
-	char **DATASet = new char*[100];
-	
-	fstream DATAFile; // declare File
-	DATAFile.open("./sample_DENV2.fasta", std::fstream::in); //Open File
-//	DATAFile.open("./sample_reads.fasta", std::fstream::in); //Open File
-	k=0;
-	while (!DATAFile.eof())
-	{
-		DATAFile.getline (temp,QSize+1);
-		if (temp[0] != '>') {
-			DATASet[k] = new char[QSize];
-			for (i=0; i<QSize; i++) {DATASet[k][i] = temp[i];}
-			k++;
-		};
-	}
-//	cout<<"Got "<< k-1<<" test reads."<<endl;
-	
-	int bitArray[G-wordSize+1];
+	f.close();
+
+	// Calculate seed length and minimum cluster size
+	wordSize = (N/(SNPLimit+1))-1;
+	clustMin = (N%wordSize)+1;
+
+	// Build prefix trie from reference genome
+	PrefixTrie PT((char*)genome.c_str(), G, wordSize);
+
+	// -----------> Logic below can be threaded
+	// vectors for potential alignment sites and actual alignment sites
+    vector<unsigned int>  potential_starts, reset_positions;
+    vector<pair<unsigned int, int>> position_starts;
+
+    // Create a positionArray to mark seed locations
+	uint8_t* positionArray = new uint8_t[G-wordSize+1];
 	int *locations;
-	
-	for (i=0;i<N;i++)
-	{
-		for (j=0; j<G-wordSize+1; j++){bitArray[j] = 0;}
-		for (j=0; j<QSize-wordSize; j++)
-		{
-			for (k=0; k < wordSize; k++){temp[k] = DATASet[i][k+j];}
-			locations = PT.found(temp, wordSize);
-			if (locations)
-			{
-				for (k=1; k<locations[0]; k++){bitArray[locations[k]] = 1;}
-			}
-		}
-		largestCluster = 0;
-		for (j=0; j < G - QSize; j++)
-		{
-			tempCount =0;
-			for (k=0; k< QSize - wordSize + 1; k++)
-			{
-				tempCount = tempCount + bitArray[k+j];
-			}
-			if (tempCount > largestCluster)
-			{
-				clusterLoc = j;
-				largestCluster = tempCount;
-			}
-		}
-		/* ----------------- ISAAC IS WORKING BELOW HERE ----------------*/
-		int tempCount = 0;
-		int firstClusterSeed = 0;
-		int lastClusterSeed = 0;
-		alignment.score = QSize;
-		while (alignment.score > SNPLimit)
-		{
-			alignment = SW.align(
-		
-		
-		cout << "For seq "<<i<<", the largest cluster "<<largestCluster<<" found at "<<clusterLoc<<endl;
-	}
-		
+    for (j=0; j<G-wordSize+1; j++){positionArray[j] = 0;}
+
+    for(unsigned int ind = 0; ind < read_total; ind++){
+        // Zero out position array used to find clusters
+        for (j=0; j<reset_positions.size(); j++){positionArray[reset_positions[j]] = 0;}
+        reset_positions.clear();
+        // Finds seeds of the desired length then inserts them into
+        // the position array incrementing to account for duplicate seeds
+        for (i=0;i<wordSize;i++)
+        {
+            for (j=i; j < N - wordSize + 1; j+=wordSize)
+            {
+                locations = PT.found(reads[ind]+(j), wordSize);
+                if(locations){
+                    for( k=1; k < locations[0];k++)
+                        positionArray[locations[k]]++;
+                        reset_positions.push_back(locations[k]);
+                }
+            }
+        }
+
+        // Goes through positionArray to find sections that meet the minimum seed criteria
+        // breaks inner loop when cluster threshold is met
+        for (j=0; j < G - N + 1; j++)
+        {
+            int tempCount =0;
+            for (k=0; k<N; k++)
+            {
+                if (positionArray[j+k]){
+                    tempCount += positionArray[j+k];
+                }
+                if(tempCount >= clustMin){
+                    potential_starts.push_back(j);
+                    break;
+                }
+            }
+        }
+
+        // Gets edit distance for potential alignment sites adding the sites that meet mismatch criteria
+        // to a vector is then used to build required output string associating read to mapped locations
+        for(j=0;j < potential_starts.size();j++){
+            temp = genome.substr(potential_starts[j], N);
+            if (temp.length() == N){
+                int mm = levenshtein((char*)temp.c_str(), N, reads[ind], N, SNPLimit);
+                if (mm <= SNPLimit)
+                    position_starts.push_back(make_pair(potential_starts[j], mm));
+            }
+        }
+        potential_starts.clear();
+
+        // builds string then prints it to stdout for piping, threaded version would need to use
+        // thread-safe memory space or write to different files.
+        temp = headers[ind];
+        temp += "$";
+        for(j=0;j< position_starts.size();j++){
+            temp += to_string(position_starts[j].first) +":" + to_string(position_starts[j].second) +",";
+            }
+            cout << temp.substr(0, temp.length()-1) <<endl;
+            position_starts.clear();
+    }
 	return 0;
 }
 
-	
