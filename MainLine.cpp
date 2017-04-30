@@ -63,7 +63,6 @@ int main(int argc, char *argv[])
 
 	}
 	f.close();
-    cout << argc << endl;
 	// Calculate seed length and minimum cluster size
 	if (argc >4 ){
         wordSize = atoi(argv[4]);
@@ -74,7 +73,6 @@ int main(int argc, char *argv[])
         clustMin = atoi(argv[5]);
 	}else{
         clustMin = (N%wordSize)+1;
-
 	}
 
 	// Build prefix trie from reference genome
@@ -114,7 +112,7 @@ int main(int argc, char *argv[])
         for (j=0; j < G - N + 1; j++)
         {
             int tempCount =0;
-            for (k=0; k<N; k++)
+            for (k=0; k<N-wordSize+1; k++)
             {
                 if (positionArray[j+k]){
                     tempCount += positionArray[j+k];
