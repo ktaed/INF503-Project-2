@@ -4,7 +4,8 @@ Sareh Assiri
 Isaac Shaffer  
 Tsosie E Schneider  
 
-MainLine.cpp --- Main Program  
+MainLine.cpp --- Main Program  takes 5 command line parameters. First 3 are required.
+	<reads_file> <reference_genome> <mismatch_tolerance> <seed_size> <cluster_count>
 prefixtrie.cpp --- PrefixTrie class  
 Levenshtein.cpp  --- Levenshtein distance function  
 
