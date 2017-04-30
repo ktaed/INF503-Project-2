@@ -90,7 +90,9 @@ int main(int argc, char *argv[])
 
     for(unsigned int ind = 0; ind < read_total; ind++){
         // Zero out position array used to find clusters
-        for (j=0; j<reset_positions.size(); j++){positionArray[reset_positions[j]] = 0;}
+    for (j=0; j<G-wordSize+1; j++){positionArray[j] = 0;}
+
+//        for (j=0; j<reset_positions.size(); j++){positionArray[reset_positions[j]] = 0;}
         reset_positions.clear();
         // Finds seeds of the desired length then inserts them into
         // the position array incrementing to account for duplicate seeds
