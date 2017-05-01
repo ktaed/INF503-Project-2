@@ -13,11 +13,11 @@ Answer)
 # of Seed survive= [100 – ((4)(23))] +1 = [8 +1]=9.
 
 
-Seed Size	# of Seed survive
-25        1
-24	    5
-23	    9
-22	    13
+Seed Size--------# of Seed survive
+25------|-----1
+24------|-----5
+23------|-----9
+22	  13
 21	    17
 
 ->	From where we get 9 seed ?
