@@ -14,7 +14,7 @@ Answer)
 
 
 Seed Size	# of Seed survive
-25      1
+25       1
 24	    5
 23	    9
 22	    13
