@@ -37,3 +37,24 @@ int levenshtein(char *SeqA, int sizeA, char *SeqB, int sizeB, int maxSNP)
 		}
         return DScore[sizeA][sizeB];
 	}
+
+string rev_comp(string genome){
+    string rev_comp;
+    rev_comp.reserve(genome.length());
+    long i;
+    for(i = genome.length()-1; i >= 0; i--){
+        if (genome[i] == 'A'){
+            rev_comp += "T";
+        }
+        else if (genome[i] == 'C'){
+            rev_comp += "G";
+        }
+        else if (genome[i] == 'G'){
+            rev_comp += "C";
+        }
+        else{
+            rev_comp += "A";
+        }
+    }
+    return rev_comp;
+}
