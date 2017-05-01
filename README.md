@@ -5,7 +5,11 @@ Isaac Shaffer
 Tsosie E Schneider  
 
 MainLine.cpp --- Main Program  takes 5 command line parameters. First 3 are required.
+   Input
 	<reads_file> <reference_genome> <mismatch_tolerance> <seed_size> <cluster_count>
+   Output
+	string to stdout in the format 
+	<read_header>$<comma seperated list mapping position to mismatch with ':'>~<comma seperated list mapping reverse complement position to mismath with ':'>
 prefixtrie.cpp --- PrefixTrie class  
 Levenshtein.cpp  --- Levenshtein distance function  
 
