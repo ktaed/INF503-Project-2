@@ -17,8 +17,8 @@ Seed Size--------# of Seed survive
 25------|-----1
 24------|-----5
 23------|-----9
-22	  13
-21	    17
+22------|-----13
+21------|-----17
 
 ->	From where we get 9 seed ?
 If we have Seq length 100, and we have 3 SNP, also we have seed size 23. then in worst case scenario we will have at least 8+1 seeds survive. (see the table) 
