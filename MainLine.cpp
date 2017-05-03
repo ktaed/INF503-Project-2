@@ -5,8 +5,9 @@
 #include <string.h>
 #include <vector>
 #include <utility>
-
+#include <time.h>
 using namespace std;
+
 
 int main(int argc, char *argv[])
 {
@@ -16,7 +17,8 @@ int main(int argc, char *argv[])
 	unsigned int wordSize, clustMin;
 	unsigned int G = 0;
     unsigned int read_total = 0;
-
+	int elapsed_time = time(0);
+	
 	int SNPLimit = atoi(argv[3]);
     char** headers, **reads;
 	ifstream f;
@@ -194,6 +196,19 @@ int main(int argc, char *argv[])
         cout << temp <<endl;
         position_starts.clear();
 }
+	elapsed_time = time(0)- elapsed_time;
+	int time_remaining = elapsed_time % 86400;
+        cout <<"days:"<<  elapsed_time /86400<<endl;
+	elasped_time = time_remaining;
+	time_remaining = elapsed_time % 3600;
+	cout<<"hours:"<<  elapsed_time /3600<<endl;
+	elasped_time = time_remaining;
+	time_remaining = elapsed_time % 60;
+	cout<<"minute:"<<  elapsed_time /60<<endl;
+	elasped_time = time_remaining;
+	cout<<"second:"<<  elapsed_time <<endl;
+
 	return 0;
 }
+
 
