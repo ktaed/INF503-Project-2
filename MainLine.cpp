@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	unsigned int G = 0;
     unsigned int read_total = 0;
 	int elapsed_time = time(0);
-	
+
 	int SNPLimit = atoi(argv[3]);
     char** headers, **reads;
 	ifstream f;
@@ -195,6 +195,7 @@ int main(int argc, char *argv[])
 
         cout << temp <<endl;
         position_starts.clear();
+        rc_position_starts.clear();
 }
 	elapsed_time = time(0)- elapsed_time;
 	int time_remaining = elapsed_time % 86400;
