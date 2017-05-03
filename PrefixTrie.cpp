@@ -18,6 +18,7 @@ class PrefixTrie
 	unsigned int nodeCount, maxReps;
 	
 	public:
+	// Default Constructor for Prefix Trie
 	PrefixTrie()
 	{
 		this->nodeCount = 0;
@@ -41,7 +42,7 @@ class PrefixTrie
 			add(loadSeq, wordSize, i); 
 		}// end i for
 	}
-	
+	// Default Destructor for Prefix Trie
 	~PrefixTrie()
 	{
 		prune(this->root);
