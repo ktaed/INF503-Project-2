@@ -63,7 +63,7 @@ Below are the calculation of the number of surviving seed.
 If we have Seq length 100, 3 SNP's, and also have seed size of 23, then in worst case scenario we will have at least 8+1 seeds survive. (the calculation of the number of surviving seed) 
 
 -> Why our SEED is Exhaustive?	
-If our seed size = 23 and we have 3 SNP then for our worst-case scenario, which in here is equal to 9 seeds surviving. We use these seeds for our alignment by using the Levenshtein approach to come up with an exhaustive search.
+If our seed size = 23 and we have 3 SNP then for our worst-case scenario, which in here is equal to 9 seeds surviving. We use these seeds for our alignment by using the Levenshtein approach (Levenshtein edit distance function modified to break calculation when SNP limit met) to come up with an exhaustive search.
 
 
 
