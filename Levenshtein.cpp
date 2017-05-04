@@ -37,7 +37,7 @@ int levenshtein(char *SeqA, int sizeA, char *SeqB, int sizeB, int maxSNP)
 		}
         return DScore[sizeA][sizeB];
 	}
-
+// The reverse complement funtion for the genome since DNa is double stranded
 string rev_comp(string genome){
     string rev_comp;
     rev_comp.reserve(genome.length());
