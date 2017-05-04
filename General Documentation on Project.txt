@@ -28,3 +28,42 @@ Considering the worst case scenario, we are intersted in introducing SNP's in th
 We do this by evenly distributing our 3 SNP's across the read. In our case since the read is 100 bases long, the SNP's were introduced at positions 25, 50, and 75. With these positions we are certain of the breaking all seeds with the exception of one. Therefore, we have just one surving seed. 
 To get a reasonable amount of seeds in order to be exhaustive, we chose a seed size of 23 with a minimum of 9 surviving seed in the worst case scenario.
 With at least this number, we are guaranteed of exhaustiveness. We can actually find an allignment when one exists.
+
+
+How to calculate the number of surviving Seeds.
+
+We have:
+
+- Number of surving Seeds = [seq length- ((#of SNP+1)(seed size))] +1        *** where seq length=100
+
+Seed size for any SNP = seq length /(# of SNP+1) 
+- Seed size for 3 SNP = 100/4 =2 5   (in this case, we will find at least one surviving seed) 
+
+From the table below, we have the seed size and the number of surviving seeds
+
+Seed Size--------# of surviving seeds
+25------|-----1
+24------|-----5
+23------|-----9
+22------|-----13
+21------|-----17
+
+Suppose we have Seq length = 100 , and 3 SNP and we need size of seed equal 25 ,24, and 23 . 
+
+Below are the calculation of the number of surviving seed.
+
+# of Seed survive= [100 – ((3+1)(25))] +1 = [0+1]=1
+# of Seed survive= [100 – ((4)(24))] +1 = [4 +1]=5
+# of Seed survive= [100 – ((4)(23))] +1 = [8 +1]=9.
+
+
+
+->How did we get 9 seeds?
+
+If we have Seq length 100, 3 SNP's, and also have seed size of 23, then in worst case scenario we will have at least 8+1 seeds survive. (the calculation of the number of surviving seed) 
+
+-> Why our SEED is Exhaustive?	
+If our seed size = 23 and we have 3 SNP then for our worst-case scenario, which in here is equal to 9 seeds surviving. We use these seeds for our alignment by using the Levenshtein approach to come up with an exhaustive search.
+
+
+
