@@ -1,12 +1,30 @@
-Basic Info 
-Genome Size: 5,227,294 bp (10,454,588 if we include 3’-5’) Given Query Size 100 Chosen Seed Size: 23 Nodes for 5’-3’: 62,311,380. 
-Estimated trie size: 3.25 GB Max recurrences of Seeds: 13 
-Basic Idea 
-This is fundamentally a BLAST algorithm that is going to be forced to be exhaustive. It will take a genome (G) and break it down into seeds of size 23 (explanation for seed size is below). It then creates a prefix trie from the seeds - recording the location in the genome for each seed in the trie. The routine then executes each query as follows: 
-	1.	Initialize a bitarray that is G − 23 + 1 long.  
-	2.	Break query into seeds of size 23  
-	3.	Search trie with seeds. If seed is in trie, flip the bits in the bit array associated with the seed locations.  
-	4.	When all query seeds have been checked against the trie, examine a moving total (of the same length as number of seeds in query) of the bitarray.  
-	5.	Check location with largest total using Smith-Waterman. Keep alignment is it has 3 or less SNPs (single nucleotide polymorphisms).  
-	6.	If no alignment found in previous step, decrease moving total by one and repeat last step. Stop when moving total less than or equal to 9 (See discussion below about exhaustive criteria).  
-Exhaustiveness 
+GENERAL OVERVIEW
+
+Genome Size: 5,227,294 bases long Antracis bacteria genome 
+We include the reverse complement (3’-5’) giving us a total size of 10,454,588. 
+Query Size used in this project is 100 bases long and we have 15901538 read set 
+
+We impored the blast approach.
+-Seed size was chosen to be 23
+-Total Nodes for 5’-3’: 62,311,380. 
+-Estimated trie size: 3.25 GB 
+-Max recurrences of Seeds: 13 
+
+BASIC IDEA
+This is fundamentally a BLAST algorithm that is going to be forced to be exhaustive. It will take a genome (with size of G) and break it down into seeds of size 23 (explanation for seed size is below). It then creates a prefix trie from the seeds and recording the location in the genome for each seed in the trie. 
+
+The routine then executes each query as follows: 
+	1. Initialize a bitarray that is G − 23 + 1 long.
+	2. Break query into seeds of size 23.
+	3. Search trie with seeds. If seed is in trie, flip the bits in the bit array associated with the seed locations.
+	4. When all query seeds have been checked against the trie, examine a moving total (of the same length as number                  of seeds in query) of the bitarray.
+	5. Check location with largest total using Smith-Waterman. Keep alignment is it has 3 or less SNPs (single nucleotide            polymorphisms). 
+	6. If no alignment found in previous step, decrease moving total by one and repeat last step. Stop when moving total 
+	   less than or equal to 9 (See discussion below about exhaustive criteria). 
+
+EXHAUSTIVENESS
+
+Considering the worst case scenario, we are intersted in introducing SNP's in the read such that most of the seed will be broken.
+We do this by evenly distributing our 3 SNP's across the read. In our case since the read is 100 bases long, the SNP's were introduced at positions 25, 50, and 75. With these positions we are certain of the breaking all seeds with the exception of one. Therefore, we have just one surving seed. 
+To get a reasonable amount of seeds in order to be exhaustive, we chose a seed size of 23 with a minimum of 9 surviving seed in the worst case scenario.
+With at least this number, we are guaranteed of exhaustiveness. We can actually find an allignment when one exists.
