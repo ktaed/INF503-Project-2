@@ -2,6 +2,7 @@
 
 using namespace std;
 
+// The structure of the node
 struct Node
 {
 	Node *A;
@@ -90,6 +91,7 @@ class PrefixTrie
 		deleteNode(current);
 	}
 	
+	// A function returning nothing
 	void add(char *seq, int seqSize, int locInG)
 	{
 		Node *current = this->root;
