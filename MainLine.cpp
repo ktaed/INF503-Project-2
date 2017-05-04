@@ -8,7 +8,7 @@
 #include <time.h>
 using namespace std;
 
-
+// The main program
 int main(int argc, char *argv[])
 {
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 	ifstream f;
     string genome, rc_genome,temp, line;
 
-    // Load genome into string
+    // Loading the Antracis genome into string
 	f.open(argv[2]);
 	while (!f.eof())
 	{
@@ -34,10 +34,10 @@ int main(int argc, char *argv[])
 	}
     f.close();
     rc_genome = rev_comp(genome);
-    // Assign genome length
+    // Assignment of genome length
     G = genome.length();
 
-    // Count the total reads for space allocation and get read length
+    // Counting the total reads for space allocation and get read length
 	f.open(argv[1], std::fstream::in); //Open File
 	while(!f.eof()){
         getline(f, line);
@@ -48,11 +48,11 @@ int main(int argc, char *argv[])
 	}
 	f.close();
 
-    // Allocate space for reads
+    // Space allocation for reads
 	headers = new char*[read_total];
     reads = new char*[read_total];
 
-    // Read in the reads file
+    // Read in the 100-mers read set file
     f.open(argv[1], std::fstream::in); //Open File
 	for(i=0;i<read_total;i++){
         getline(f, line);
@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
 
 	}
 	f.close();
+	
 	// Calculate seed length and minimum cluster size
 	if (argc >4 ){
         wordSize = atoi(argv[4]);
@@ -78,7 +79,7 @@ int main(int argc, char *argv[])
 	}
 
 
-	// Build prefix trie from reference genome
+	// Building the prefix trie from reference genome
 	PrefixTrie PT((char*)genome.c_str(), G, wordSize);
 	PrefixTrie RC_PT((char*)rc_genome.c_str(), G, wordSize);
 
