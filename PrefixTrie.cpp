@@ -14,6 +14,7 @@ struct Node
 
 class PrefixTrie
 {
+	// Root node pointer
 	private:
 	Node *root;
 	unsigned int nodeCount, maxReps;
@@ -26,7 +27,7 @@ class PrefixTrie
 		this->maxReps = 0;
 		this->root = newNode();
 	}
-	
+	// Contructor for a prefix trie based on a given sequence
 	PrefixTrie(char *seq, int seqSize, int wordSize)
 	{
 		int i,j;
@@ -49,7 +50,7 @@ class PrefixTrie
 		prune(this->root);
 		this->root = NULL;
 	}
-
+        // Creating an initialized new node
 	Node *newNode()
 	{
 		Node *current = new Node;
@@ -62,14 +63,14 @@ class PrefixTrie
 		this->nodeCount++;
 		return current;
 	}
-	
+	// Deallocating memory and deletion of node
 	void deleteNode(Node *current)
 	{
 		delete current->loc;
 		delete current;
 		this->nodeCount--;
 	}
-	
+	// Taking of any branch of a prefix trie
 	void prune(Node *current)
 	{
 		if (current->A)
@@ -91,7 +92,7 @@ class PrefixTrie
 		deleteNode(current);
 	}
 	
-	// A function returning nothing
+	// A adding sequences to the trie
 	void add(char *seq, int seqSize, int locInG)
 	{
 		Node *current = this->root;
@@ -140,6 +141,8 @@ class PrefixTrie
 				break;			
 			}// end switch
 		}// end for
+		
+		// Dynamically creating new arrays for where a seed is found in a genome
 		int *temp = current->loc;
 		current->loc = new int[temp[0]+1];
 		for (int k=0; k < temp[0]; k++)
@@ -156,6 +159,7 @@ class PrefixTrie
 		return this->nodeCount;
 	}
 	
+	// Searching the prefix trie and returns an array of locations if seed is found
 	int *found(char *seq, int seqSize)
 	{
 		Node *current = this->root;
