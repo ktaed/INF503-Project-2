@@ -63,6 +63,9 @@ class PrefixTrie
 		this->nodeCount++;
 		return current;
 	}
+	unsigned int node_count(){
+	    return this->nodeCount;
+	}
 	// Deallocating memory and deletion of node
 	void deleteNode(Node *current)
 	{

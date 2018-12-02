@@ -77,12 +77,21 @@ int main(int argc, char *argv[])
 	}else{
         clustMin = (N%wordSize)+1;
 	}
-
-
+	
+	if (argc >6 ){
+        clustMin = atoi(argv[5]);
+	}else{
+        clustMin = (N%wordSize)+1;
+	}
+	if (argc >7 ){
+        clustMin = atoi(argv[5]);
+	}else{
+        clustMin = (N%wordSize)+1;
+	}
 	// Building the prefix trie from reference genome
 	PrefixTrie PT((char*)genome.c_str(), G, wordSize);
 	PrefixTrie RC_PT((char*)rc_genome.c_str(), G, wordSize);
-
+    cout <<  PT.node_count() <<"\n";
 	// -----------> Logic below can be threaded
 	// vectors for potential alignment sites and actual alignment sites
     vector<unsigned int>  potential_starts, rc_potential_starts, reset_positions;
